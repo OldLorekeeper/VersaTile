@@ -8,18 +8,14 @@ Key among its features is the ability to define layouts using **absolute pixel c
 
 - **Hybrid Layout Engine**: Define tiles using a mix of measurement units to suit specific workflow needs:
     
-    - **Percentages**: Standard relative sizing (e.g. `50` for 50% width).
+    - **Percentages**: Standard relative sizing
         
-    - **Grids**: Simple row/column divisions (e.g. `2x2`).
+    - **Grids**: Simple row/column divisions
         
-    - **Absolute Pixels**: Precise coordinates for pixel-perfect layouts, essential for ultra-wide or specialized display setups.
+    - **Absolute Pixels**: Precise coordinates for pixel-perfect layouts, essential for ultra-wide or specialized display setups
         
-- **Two Tiling Modes**:
+- **Mouse control**: A layout popup appears near your cursor. Drag the window onto a grid cell to resize it instantly.
     
-    - **Popup Grid**: A cursor-centric menu for rapid window placement.
-        
-    - **Overlay**: A full-screen, visual overlay (similar to FancyZones) for intuitive drag-and-drop tiling.
-        
 - **Performance**: Built with a clean, efficient codebase to minimise overhead and ensure smooth animations and responsiveness.
     
 - **Multi-Monitor Support**: Correctly handles layouts across different screen resolutions and scaling factors.
@@ -32,14 +28,14 @@ Key among its features is the ability to define layouts using **absolute pixel c
 1. Clone the repository:
     
     ```
-    git clone [https://github.com/yourusername/VersaTile.git](https://github.com/yourusername/VersaTile.git)
+    git clone https://github.com/OldLorekeeper/VersaTile.git
     cd VersaTile
     ```
     
 2. Install using `kpackagetool6`:
     
     ```
-    kpackagetool6 --type=KWin/Script -i .
+    kpackagetool6 --type=KWin/Script -i src/
     ```
     
 3. Enable the script in System Settings or via command line:
@@ -50,24 +46,6 @@ Key among its features is the ability to define layouts using **absolute pixel c
     ```
     
 
-## Usage
-
-VersaTile activates automatically when you begin dragging a window (configurable).
-
-- **Popup Grid**: Appears near your cursor. Drag the window onto a grid cell to resize it instantly.
-    
-- **Overlay**: Drag the window to the edges of the screen (or trigger via shortcut) to see the full layout overlay.
-    
-
-### Default Keybindings
-
-- **Meta + G**: Toggle VersaTile visibility manually.
-    
-- **Meta + Shift + G**: Switch between Popup and Overlay modes.
-    
-
-_(Note: Keybindings can be customised in KWin Shortcuts)_
-
 ## Configuration
 
 VersaTile uses a declarative syntax for defining layouts. You may define layouts using standard grids, specific coordinates (X,Y,W,H), or centered definitions.
@@ -76,7 +54,7 @@ VersaTile uses a declarative syntax for defining layouts. You may define layouts
 
 **1. Standard Grids** Define simple rows and columns.
 
-- Example: `2x2` (Creates 4 equal quadrants)
+- Example: `2x1` (Creates 4 equal quadrants)
     
 
 **2. Coordinate-Based (X, Y, W, H)** Define specific positions and sizes. You can use percentages (raw numbers 0-100) or absolute pixels (`px`).
