@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Name": "VersaTile",
+        "Description": "Hybrid tiling assistant (Pixels, Percentages, Grids)",
+        "Icon": "preferences-system-windows",
+        "Id": "versatile",
+        "Version": "1.0",
+        "License": "GPLv3",
+        "Authors": [
+            { "Name": "OldLorekeeper" }
+        ]
+    },
+    "X-Plasma-API": "declarativescript",
+    "X-Plasma-MainScript": "ui/main.qml"
+}
