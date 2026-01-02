@@ -9,7 +9,6 @@ Item {
     id: root
 
     // --- 1. CONFIGURATION ---
-    // Your specific layout list
     readonly property var rawLayouts: [
         "720px,57px,2000px,1250px",
         "970px,203px,1500px,950px",
@@ -31,15 +30,16 @@ Item {
 
     // --- 2. INITIALIZATION & PARSING ---
     Component.onCompleted: {
-        console.info("VersaTile: Loaded. Author: OldLorekeeper");
+        console.info("VersaTile: Initializing...");
 
-        // Parse layouts immediately
+        // Parse layouts
         var parsed = [];
         for (var i = 0; i < rawLayouts.length; i++) {
             var layoutObj = parseLayout(rawLayouts[i]);
             if (layoutObj) parsed.push(layoutObj);
         }
         parsedLayouts = parsed;
+        console.info("VersaTile: Parsed " + parsedLayouts.length + " layouts.");
 
         // Hook existing windows
         var clients = Workspace.stackingOrder;
@@ -59,13 +59,18 @@ Item {
     function connectWindow(client) {
         if (!client || !client.normalWindow) return;
 
-        client.interactiveMoveResizeStarted.connect(function() {
-            if (client.move) {
-                isMoving = true;
-                activeClient = client;
-                showPopup();
-            }
-        });
+        // Disconnect first to avoid duplicates if re-added
+        try { client.interactiveMoveResizeStarted.disconnect(client.moveHandler); } catch(e) {}
+
+        // Define handler
+        client.moveHandler = function() {
+            console.info("VersaTile: Move detected for " + client.caption);
+            isMoving = true;
+            activeClient = client;
+            showPopup();
+        };
+
+        client.interactiveMoveResizeStarted.connect(client.moveHandler);
 
         client.interactiveMoveResizeFinished.connect(function() {
             isMoving = false;
@@ -86,13 +91,11 @@ Item {
         var finalRect = { x: 0, y: 0, width: 100, height: 100 };
 
         if (tile.type === "px") {
-            // Absolute Pixel Mode (Respects multi-monitor offsets)
             finalRect.x = area.x + tile.x;
             finalRect.y = area.y + tile.y;
             finalRect.width = tile.w;
             finalRect.height = tile.h;
         } else {
-            // Percentage Mode
             finalRect.x = area.x + (tile.x / 100.0 * area.width);
             finalRect.y = area.y + (tile.y / 100.0 * area.height);
             finalRect.width = (tile.w / 100.0 * area.width);
@@ -100,7 +103,6 @@ Item {
         }
 
         activeClient.frameGeometry = Qt.rect(finalRect.x, finalRect.y, finalRect.width, finalRect.height);
-
         popup.visible = false;
         isMoving = false;
     }
@@ -110,7 +112,7 @@ Item {
         var layout = { tiles: [] };
         var parts = str.split('+');
 
-        // 1. Grid Detection (e.g. "2x1")
+        // Grid Detection
         if (parts.length === 1 && parts[0].indexOf(',') === -1 && parts[0].indexOf('x') !== -1) {
             var dim = parts[0].split('x');
             var cols = parseInt(dim[0]);
@@ -119,20 +121,16 @@ Item {
             if (!isNaN(cols) && !isNaN(rows)) {
                 var w = 100.0 / cols;
                 var h = 100.0 / rows;
-
                 for (var r = 0; r < rows; r++) {
                     for (var c = 0; c < cols; c++) {
-                        layout.tiles.push({
-                            type: '%',
-                            x: c * w, y: r * h, w: w, h: h
-                        });
+                        layout.tiles.push({ type: '%', x: c * w, y: r * h, w: w, h: h });
                     }
                 }
                 return layout;
             }
         }
 
-        // 2. Coordinate Detection (Pixels or Percent)
+        // Coordinate Detection
         for (var i = 0; i < parts.length; i++) {
             var coords = parts[i].split(',');
             if (coords.length === 4) {
@@ -142,14 +140,10 @@ Item {
                     var s = coords[k].trim();
                     if (s.indexOf('px') !== -1) isPx = true;
                     var v = parseInt(s);
-                    if (v > 100) isPx = true; // Heuristic: >100 is likely pixels
+                    if (v > 100) isPx = true;
                     val.push(v);
                 }
-
-                layout.tiles.push({
-                    type: isPx ? 'px' : '%',
-                    x: val[0], y: val[1], w: val[2], h: val[3]
-                });
+                layout.tiles.push({ type: isPx ? 'px' : '%', x: val[0], y: val[1], w: val[2], h: val[3] });
             }
         }
         return layout;
@@ -163,26 +157,18 @@ Item {
         var screen = Workspace.activeScreen;
         var area = Workspace.clientArea(KWin.FullScreenArea, screen, Workspace.currentDesktop);
         var centerX = area.x + (area.width / 2);
-
-        // --- OPPOSITE DIRECTION LOGIC ---
-        // Margin from screen edge
         var margin = 50;
 
-        // Reset animation state
         popup.opacity = 0;
         popup.scale = 0.95;
 
         if (cursor.x < centerX) {
-            // Mouse is on LEFT -> Show Popup on RIGHT
             popup.x = (area.x + area.width) - popup.width - margin;
         } else {
-            // Mouse is on RIGHT -> Show Popup on LEFT
             popup.x = area.x + margin;
         }
 
-        // Center Vertically
         popup.y = area.y + (area.height / 2) - (popup.height / 2);
-
         popup.visible = true;
         popupAnim.restart();
     }
@@ -190,26 +176,25 @@ Item {
     PlasmaCore.Dialog {
         id: popup
         visible: false
-        // Modern Wayland flags
         flags: Qt.Popup | Qt.BypassWindowManagerHint | Qt.FramelessWindowHint
         location: PlasmaCore.Types.Desktop
         backgroundHints: PlasmaCore.Types.NoBackground
 
-        // Appear Animation
+        // Critical for visibility in some Plasma versions
+        mainItem: background
+
         ParallelAnimation {
             id: popupAnim
             NumberAnimation { target: popup; property: "opacity"; from: 0; to: 1; duration: 150; easing.type: Easing.OutQuad }
             NumberAnimation { target: popup; property: "scale"; from: 0.95; to: 1; duration: 150; easing.type: Easing.OutBack }
         }
 
-        // Main Container
         Rectangle {
             id: background
             color: "transparent"
             width: gridLayout.implicitWidth + 40
             height: gridLayout.implicitHeight + 40
 
-            // Glassy Background Panel
             Rectangle {
                 anchors.fill: parent
                 color: Kirigami.Theme.backgroundColor
@@ -222,14 +207,12 @@ Item {
             GridLayout {
                 id: gridLayout
                 anchors.centerIn: parent
-                columns: 3 // Requested 3 Columns
+                columns: 3
                 rowSpacing: 15
                 columnSpacing: 15
 
                 Repeater {
                     model: parsedLayouts
-
-                    // Layout Preview Box
                     Rectangle {
                         width: 160
                         height: 90
@@ -239,7 +222,6 @@ Item {
                         opacity: 0.5
                         radius: 4
 
-                        // Hover Effect for whole layout group
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
@@ -248,16 +230,12 @@ Item {
                             onExited: parent.opacity = 0.5
                         }
 
-                        // Tiles inside the preview
                         Repeater {
                             model: modelData.tiles
                             Rectangle {
                                 property var tile: modelData
                                 property bool isPx: tile.type === "px"
 
-                                // Scale logic:
-                                // Pixel layouts assume 1920x1080 reference for preview scaling
-                                // Percent layouts use 100x100 reference
                                 x: isPx ? (tile.x / 1920.0 * parent.width) : (tile.x / 100.0 * parent.width)
                                 y: isPx ? (tile.y / 1080.0 * parent.height) : (tile.y / 100.0 * parent.height)
                                 width: isPx ? (tile.w / 1920.0 * parent.width) : (tile.w / 100.0 * parent.width)
@@ -269,24 +247,16 @@ Item {
                                 border.width: 1
                                 radius: 2
 
-                                // Click Handler
                                 MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     onEntered: parent.opacity = 0.9
                                     onExited: parent.opacity = 0.3
                                     onClicked: {
-                                        // Find parent layout index
                                         var layoutIdx = findLayoutIndex(modelData);
-                                        // Find tile index within that layout
                                         var tileIdx = -1;
-                                        if (layoutIdx !== -1) {
-                                            tileIdx = parsedLayouts[layoutIdx].tiles.indexOf(modelData);
-                                        }
-
-                                        if (layoutIdx !== -1 && tileIdx !== -1) {
-                                            applyLayout(layoutIdx, tileIdx);
-                                        }
+                                        if (layoutIdx !== -1) tileIdx = parsedLayouts[layoutIdx].tiles.indexOf(modelData);
+                                        if (layoutIdx !== -1 && tileIdx !== -1) applyLayout(layoutIdx, tileIdx);
                                     }
                                 }
                             }
