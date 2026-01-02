@@ -14,9 +14,7 @@
         
 - **Smart Popup UI:**
     
-    - Appears automatically when you start moving a window.
-        
-    - **Opposite-Side Logic:** If you move a window on the _left_ of the screen, the popup appears on the _right_ (and vice versa) so it never obstructs your view.
+    - Appears automatically under your cursor when you start moving a window.
         
 - **Visual Previews:** See exactly where the window will snap before you click.
     
