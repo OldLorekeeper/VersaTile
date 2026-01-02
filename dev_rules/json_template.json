@@ -1,0 +1,47 @@
+// ------------------------------------------------------------------------------
+// [Section Number]. [Config Title]
+// [Brief description of what this configuration controls]
+// ------------------------------------------------------------------------------
+//
+// DEVELOPMENT RULES (Read before editing):
+// 1. Formatting: Keep layout compact. No vertical whitespace inside objects.
+// 2. Separators: Use 'Sandwich' headers (// ------) with strict spacing.
+// 3. Structure: Group related keys into objects. Flatten arrays where possible.
+// 4. Context: Hardcoded for AMD Ryzen 7000/Radeon 7000. No secrets.
+// 5. Syntax: Double quotes for all keys. No trailing commas in final elements.
+// 6. Documentation: Precede sections with 'Purpose'.
+//
+// ------------------------------------------------------------------------------
+
+{
+    // ------------------------------------------------------------------------------
+    // 1. Environment Configuration
+    // ------------------------------------------------------------------------------
+
+    // Purpose: Define hardware-specific constants.
+    // - Platform: Explicitly targets Ryzen 7000 series.
+
+    "environment": {
+        "platform": "amd_ryzen_7000",
+        "gpu_family": "radeon_7000",
+        "core_count": 16,
+        "headless": true
+    },
+
+    // ------------------------------------------------------------------------------
+    // 2. Application Settings
+    // ------------------------------------------------------------------------------
+
+    // Purpose: [Description of main settings].
+    // - Paths: Absolute paths to prevent relative ambiguity.
+
+    "settings": {
+        "log_level": "debug",
+        "output_dir": "/var/log/custom_app",
+        "retry_attempts": 3,
+        "features": [
+            "fast_render",
+            "async_compute"
+        ]
+    }
+}
