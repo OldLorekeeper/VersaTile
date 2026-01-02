@@ -1,0 +1,7 @@
+.obsidian/workspace.json
+.DS_Store
+*~
+*.swp
+*.kdev4
+.kdev4/
+build/
