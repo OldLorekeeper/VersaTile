@@ -17,16 +17,15 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+// ------------------------------------------------------------------------------
+// 1. Properties & Prerequisites
+// ------------------------------------------------------------------------------
+
+// Purpose: Define external dependencies and internal state.
+// - Types: Strong typing enforces safety (e.g. int vs var).
+
 Item {
     id: root
-
-    // ------------------------------------------------------------------------------
-    // 1. Properties & Prerequisites
-    // ------------------------------------------------------------------------------
-
-    // Purpose: Define external dependencies and internal state.
-    // - Types: Strong typing enforces safety (e.g. int vs var).
-
     property string configTitle: "Default"
     property int threadCount: 16 // AMD Ryzen 7000 specific
     property bool isActive: false
@@ -38,13 +37,13 @@ Item {
         }
     }
 
-    // ------------------------------------------------------------------------------
-    // 2. Main Logic / Visuals
-    // ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+// 2. Main Logic / Visuals
+// ------------------------------------------------------------------------------
 
-    // Purpose: [Description of the main interface].
-    // - Layout: Compact row for density.
-    // - Color: Hardcoded hex for consistency.
+// Purpose: [Description of the main interface].
+// - Layout: Compact row for density.
+// - Color: Hardcoded hex for consistency.
 
     Rectangle {
         id: background
@@ -57,8 +56,8 @@ Item {
             anchors.centerIn: parent
         }
     }
-
-    // ------------------------------------------------------------------------------
-    // End
-    // ------------------------------------------------------------------------------
 }
+
+// ------------------------------------------------------------------------------
+// End
+// ------------------------------------------------------------------------------
